@@ -9,6 +9,7 @@ from __future__ import print_function
 
 from builtins import range
 
+import re
 import os
 import textwrap
 from . import mavtemplate
@@ -109,8 +110,17 @@ class MAVLink_message(object):
         '''override field getter'''
         raw_attr = getattr(self,field)
         if isinstance(raw_attr, bytes):
-            raw_attr = raw_attr.decode("utf-8").rstrip("\\00")
-        return raw_attr
+            x = raw_attr.rfind(b'\\x00')
+            if x >= 0:
+                raw_attr = raw_attr[0:x]
+            out = b''
+            for byte in raw_attr:
+                if ord(byte) >= 20 and ord(byte) <= 127:
+                    out += byte
+                else:
+                    out += b'?'
+            raw_attr = out
+        return str(raw_attr)
 
     def get_msgbuf(self):
         if isinstance(self._msgbuf, bytearray):
@@ -187,15 +197,12 @@ class MAVLink_message(object):
 
         return True
 
-    def to_dict(self):
+    def to_json(self):
         d = dict({})
         d['mavpackettype'] = self._type
         for a in self._fieldnames:
           d[a] = self.format_attr(a)
-        return d
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
+        return json.dumps(d)
 
     def sign_packet(self, mav):
         h = hashlib.new('sha256')
