@@ -1210,8 +1210,13 @@ class mavtcp(mavfile):
             self.reconnect()
         if n is None:
             n = self.mav.bytes_needed()
+        need_reconnect = False
         try:
             data = self.port.recv(n)
+            if len(data) == 0:
+                # EOF
+                print("EOF on TCP socket")
+                need_reconnect = True
         except socket.error as e:
             if e.errno in [ errno.EAGAIN, errno.EWOULDBLOCK ]:
                 return ""
