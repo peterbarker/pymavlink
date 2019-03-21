@@ -288,7 +288,8 @@ def process_file(filename, timeshift):
         msg = mlog.recv_match(args.condition)
         if msg is None: break
         try:
-            tdays = matplotlib.dates.date2num(datetime.datetime.fromtimestamp(msg._timestamp+timeshift))
+            tdays = matplotlib.dates.date2num(datetime.datetime.fromtimestamp(msg._timestamp*1000000+timeshift))
+            print("timeshift=%s ts=%s" % (timeshift, str(msg._timestamp)))
         except ValueError:
             # this can happen if the log is corrupt
             # ValueError: year is out of range
