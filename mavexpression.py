@@ -23,8 +23,10 @@ if home is not None:
         mavuser = imp.load_source('pymavlink.mavuser', extra)
         from pymavlink.mavuser import *
 
-def evaluate_expression(expression, vars):
+def evaluate_expression(expression, vars, debug=False):
     '''evaluation an expression'''
+    if debug:
+        return eval(expression, globals(), vars)
     try:
         v = eval(expression, globals(), vars)
     except NameError:
