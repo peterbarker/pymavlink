@@ -63,6 +63,7 @@ class DFFormat(object):
         self.instance_field = None
         self.unit_ids = None
         self.mult_ids = None
+        self.unit_multipliers = None
 
         if self.columns == ['']:
             self.columns = []
@@ -109,8 +110,13 @@ class DFFormat(object):
         '''set unit IDs string from FMTU'''
         if unit_ids is None:
             return
+
         self.unit_ids = unit_ids
-        instance_idx = unit_ids.find('#')
+
+        if isinstance(self.unit_ids, bytes):
+            self.unit_ids = self.unit_ids.decode(encoding='ascii')
+
+        instance_idx = self.unit_ids.find('#')
         if instance_idx != -1:
             self.instance_field = self.columns[instance_idx]
             # work out offset and length of instance field in message
@@ -1168,7 +1174,7 @@ class DFReader_binary(DFReader):
             dfformat.multiplier_id_to_multiplier = self.multiplier_id_to_multiplier
             dfformat.unit_ids = unit_ids
             dfformat.unit_multipliers = unit_multipliers
-#            dfformat.dump_field_units()
+            dfformat.dump_field_units()
 
         self.offset += fmt.len - 3
         self.remaining = self.data_len - self.offset
