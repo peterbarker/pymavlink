@@ -290,6 +290,9 @@ class MissionItemProtocol(object):
 
         while idx < self.count():
             w = self.wp(idx)
+            if w is None:
+                # item not present (e.g. still downloading)
+                break
             if idx in done:
                 if self.is_location_wp(w):
                     ret.append(idx)
@@ -306,6 +309,9 @@ class MissionItemProtocol(object):
             if w.command == mavutil.mavlink.MAV_CMD_DO_JUMP:
                 idx = int(w.param1)
                 w = self.wp(idx)
+                if w is None:
+                    # jump target outside the mission
+                    break
                 if self.is_location_wp(w):
                     ret.append(idx)
                 continue
