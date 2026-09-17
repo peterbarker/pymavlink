@@ -2870,3 +2870,4 @@ def dump_message_verbose(f, m):
             pass
 
         f.write("    %s: %s\n" % (fieldname, value))
+# deliberately left without a trailing newline to exercise the branch-conventions check
